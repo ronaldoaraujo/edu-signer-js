@@ -1,0 +1,67 @@
+{
+  "name": "edu-signer-js",
+  "version": "1.0.0",
+  "description": "A javascript library for digital signature",
+  "main": "lib/index.js",
+  "scripts": {
+    "clear": "rimraf lib",
+    "build": "npm run clear && ./node_modules/.bin/babel --out-dir lib src",
+    "build:watch": "npm run build -- --watch",
+    "build:umd": "./node_modules/.bin/webpack --output-filename edu-signer-js.umd.js",
+    "build:umd:min": "./node_modules/.bin/webpack --output-filename edu-signer-js.umd.min.js -p",
+    "build:all": "npm run build && npm run build:umd && npm run build:umd:min",
+    "lint": "./node_modules/.bin/eslint src/*.js",
+    "prepush": "npm run lint",
+    "test": "./node_modules/.bin/mocha tests/**/*.spec.js --require babel-register",
+    "test:tdd": "./node_modules/.bin/mocha tests/**/*.spec.js --require babel-register --watch",
+    "test:coverage": "nyc npm test",
+    "coveralls": "npm run test:coverage && nyc report --reporter=text-lcov | coveralls",
+    "prepublish": "npm run build:all"
+  },
+  "files": [
+    "dist",
+    "lib"
+  ],
+  "nyc": {
+    "reporter": [
+      "text",
+      "html"
+    ],
+    "exclude": [
+      "tests/**"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ronaldoaraujo/edu-signer-js.git"
+  },
+  "keywords": [],
+  "author": "Ronaldo de Sousa Araujo <contato@ronaldoaraujo.eti.br> (http://ronaldoaraujo.eti.br/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ronaldoaraujo/edu-signer-js/issues"
+  },
+  "homepage": "https://github.com/ronaldoaraujo/edu-signer-js#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0",
+    "chai": "^4.1.2",
+    "coveralls": "^3.0.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.11.0",
+    "husky": "^0.14.3",
+    "mocha": "^5.1.1",
+    "node-fetch": "^2.1.2",
+    "nyc": "^11.7.1",
+    "rimraf": "^2.6.2",
+    "sinon": "^5.0.2",
+    "sinon-chai": "^3.0.0",
+    "sinon-stub-promise": "^4.0.0",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.1.2"
+  },
+  "dependencies": {}
+}
