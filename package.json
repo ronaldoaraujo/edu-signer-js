@@ -35,7 +35,11 @@
     "type": "git",
     "url": "git+https://github.com/ronaldoaraujo/edu-signer-js.git"
   },
-  "keywords": [],
+  "keywords": [
+    "pki",
+    "digital",
+    "signature"
+  ],
   "author": "Ronaldo de Sousa Araujo <contato@ronaldoaraujo.eti.br> (http://ronaldoaraujo.eti.br/)",
   "license": "MIT",
   "bugs": {
