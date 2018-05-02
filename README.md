@@ -18,7 +18,7 @@ This library depends on [fetch](https://fetch.spec.whatwg.org/) to make requests
 
 ## Installation
 
-Get ![EduSignerWS](https://certificaedu.com.br/install).
+Get [EduSignerWS](https://certificaedu.com.br/install).
 
 ```sh
 $ npm install edu-signer-js --save
