@@ -7,8 +7,8 @@ export default class EduSigner {
     this.PKI = PKI.bind(this)();
   }
 
-  request(operation, params={}) {
-    let licenseKey = this.licenseKey;
+  request(operation, params = {}) {
+    const licenseKey = this.licenseKey;
     return new Promise(function(resolve, reject){
       const ws = new WebSocket(`ws://127.0.0.1:1235/signer?licenseKey=${licenseKey}`);
       ws.onmessage = (event) => {
