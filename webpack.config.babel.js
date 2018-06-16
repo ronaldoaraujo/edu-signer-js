@@ -1,7 +1,7 @@
 import {join} from 'path'
 
 export default {
-  mode: 'production',
+  mode: 'development',
   output: {
     path: join(__dirname, 'dist'),
     libraryTarget: 'umd',

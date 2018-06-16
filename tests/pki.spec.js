@@ -1,39 +1,32 @@
 import chai, { expect } from 'chai';
+import { Server, WebSocket } from 'mock-socket';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import sinonStubPromise from 'sinon-stub-promise';
-sinonStubPromise(sinon);
-chai.use(sinonChai);
-
-global.fetch = require('node-fetch');
-
 import EduSigner from '../src/index';
+chai.use(sinonChai);
 
 describe('PKI', () => {
   let signer;
   let pki;
-  let stubedFetch;
-  let promise;
-
-  const certificate = {
-    fingerprint: 'AAAAAA',
-    subject: 'Member one',
-    issuer: 'CertificaEdu Root CA',
-    contentBase64: 'ZGpkc2ZoZGZoaW9oYUlYSFhIVkRLU0JLSkNCWEM='
-  }
+  let expected_value;
+  const mockServer = new Server('ws://127.0.0.1:1235/signer?licenseKey=foo');
+  const sandbox = sinon.createSandbox();
 
   beforeEach(() => {
+    mockServer.on('connection', server => {
+      mockServer.send(JSON.stringify(expected_value));
+    });
+
     signer = new EduSigner({
       licenseKey: 'foo'
     });
 
     pki = signer.PKI
-    stubedFetch = sinon.stub(global, 'fetch');
-    promise = stubedFetch.returnsPromise();
+    sandbox.spy(WebSocket.prototype, 'send')
   });
 
   afterEach(() => {
-    stubedFetch.restore();
+    sandbox.restore();
   });
 
   describe('smoke tests', () => {
@@ -52,147 +45,89 @@ describe('PKI', () => {
     it('has signData method', () => {
       expect(pki.signData).to.exist;
     });
-
-    it('has signHash method', () => {
-      expect(pki.signHash).to.exist;
-    });
   });
 
   describe('getVersion', () => {
-    it('calls fetch method', () => {
-      pki.getVersion();
-
-      expect(stubedFetch).to.have.been.calledOnce;
+    it('calls send method', async () => {
+      await pki.getVersion();
+      expect(WebSocket.prototype.send).to.have.been.calledOnce;
     });
 
-    it('calls fetch with the correct URL', () => {
-      pki.getVersion();
-
-      expect(stubedFetch).to.have.been
-        .calledWith('http://127.0.0.1:1235/pki/version');
+    it('calls send with the correct arguments', async () => {
+      await pki.getVersion();
+      expect(WebSocket.prototype.send).to.have.been
+        .calledWith('{"Operation":"getVersion","Parameters":[]}');
     });
 
-    it('returns the correct data from Promise', () => {
-      promise.resolves({ version: '1.0.0' });
-      const result = pki.getVersion();
-      expect(result.resolveValue).to.be.eql({ version: '1.0.0' });
+    it('returns the correct data from pki.getVersion', async () => {
+      expected_value = { version: '1.0.0.0' };
+      const result = await pki.getVersion();
+      expect(result).to.be.eql({ version: '1.0.0.0' });
     });
   });
 
   describe('getCertificates', () => {
-    it('calls fetch method', () => {
-      pki.getCertificates();
-      expect(stubedFetch).to.have.been.calledOnce;
+    it('calls send method', async () => {
+      await pki.getCertificates();
+      expect(WebSocket.prototype.send).to.have.been.calledOnce;
     });
 
-    it('calls fetch with the correct URL', () => {
-      pki.getCertificates();
-      expect(stubedFetch).to.have.been
-        .calledWith('http://127.0.0.1:1235/pki/certificates');
+    it('calls send with the correct arguments', async () => {
+      await pki.getCertificates();
+      expect(WebSocket.prototype.send).to.have.been
+        .calledWith('{"Operation":"getCertificates","Parameters":[]}');
     });
 
-    it('returns the correct data from Promise', () => {
-      const certificates = [
+    it('returns the correct data from pki.getCertificates', async () => {
+      expected_value = [
         { fingerprint: 'AAAAAA', subject: 'Member one', issuer: 'CertificaEdu Root CA' },
         { fingerprint: 'BBBBBB', subject: 'Member two', issuer: 'CertificaEdu Root CA' }
       ]
-      promise.resolves(certificates);
-
-      const result = pki.getCertificates();
-      expect(result.resolveValue).to.be.eql(certificates);
+      const result = await pki.getCertificates();
+      expect(result).to.be.eql(expected_value);
     });
   });
 
   describe('getCertificate', () => {
-    it('calls fetch method', () => {
-      pki.getCertificate();
-
-      expect(stubedFetch).to.have.been.calledOnce;
+    it('calls send method', async () => {
+      await pki.getCertificate();
+      expect(WebSocket.prototype.send).to.have.been.calledOnce;
     });
 
-    it('calls fetch with the correct URL', () => {
-      pki.getCertificate('AAAAAA');
-      expect(stubedFetch).to.have.been
-        .calledWith('http://127.0.0.1:1235/pki/certificate/AAAAAA');
-
-      pki.getCertificate('BBBBBB');
-      expect(stubedFetch).to.have.been
-        .calledWith('http://127.0.0.1:1235/pki/certificate/BBBBBB');
+    it('calls send with the correct arguments', async () => {
+      await pki.getCertificate('AAAAAA');
+      expect(WebSocket.prototype.send).to.have.been
+        .calledWith('{"Operation":"getCertificate","Parameters":[{"Key":"Thumbprint","Value":"AAAAAA"}]}');
     });
 
-    it('returns the correct data from Promise', () => {
-      promise.resolves(certificate);
-
-      const result = pki.getCertificates();
-      expect(result.resolveValue).to.be.eql(certificate);
+    it('returns the correct data from pki.getCertificate', async () => {
+      expected_value = {
+        thumbprint: 'AAAAAA',
+        subject: 'Member one',
+        issuer: 'CertificaEdu Root CA',
+        contentBase64: 'ZGpkc2ZoZGZoaW9oYUlYSFhIVkRLU0JLSkNCWEM='
+      }
+      const result = await pki.getCertificate("AAAAAA");
+      expect(result).to.be.eql(expected_value);
     });
   });
 
   describe('signData', () => {
-    const data = {
-      data: 'aGVsbG8='
-    }
-
-    const options = {
-      method: 'POST',
-      body:    JSON.stringify({certificate, data}),
-      headers: {
-        Authorization: `'Bearer foo'`,
-        'Content-Type': 'application/json'
-      },
-    };
-
-    it('calls fetch method', () => {
-      pki.signData();
-
-      expect(stubedFetch).to.have.been.calledOnce;
+    it('calls send method', async () => {
+      await pki.signData();
+      expect(WebSocket.prototype.send).to.have.been.calledOnce;
     });
 
-    it('calls fetch with the correct URL and parameters', () => {
-      pki.signData(certificate, data);
-      expect(stubedFetch).to.have.been
-        .calledWith('http://127.0.0.1:1235/pki/signData', options);
+    it('calls send with the correct URL and parameters', async () => {
+      await pki.signData('AAAAAA', 'aGVsbG8=');
+      expect(WebSocket.prototype.send).to.have.been
+        .calledWith('{"Operation":"signData","Parameters":[{"Key":"Thumbprint","Value":"AAAAAA"},{"Key":"Data","Value":"aGVsbG8="}]}');
     });
 
-    it('returns the correct data from Promise', () => {
-      promise.resolves({signedData: 'YUdWc2JHOD0='});
-
-      const result = pki.signData(certificate, data);
-      expect(result.resolveValue).to.be.eql({signedData: 'YUdWc2JHOD0='});
-    });
-  });
-
-  describe('signHash', () => {
-    const hash = {
-      data: 'aGVsbG8='
-    }
-
-    const options = {
-      method: 'POST',
-      body:    JSON.stringify({certificate, hash}),
-      headers: {
-        Authorization: `'Bearer foo'`,
-        'Content-Type': 'application/json'
-      },
-    };
-
-    it('calls fetch method', () => {
-      pki.signHash();
-
-      expect(stubedFetch).to.have.been.calledOnce;
-    });
-
-    it('calls fetch with the correct URL and parameters', () => {
-      pki.signHash(certificate, hash);
-      expect(stubedFetch).to.have.been
-        .calledWith('http://127.0.0.1:1235/pki/signHash', options);
-    });
-
-    it('returns the correct data from Promise', () => {
-      promise.resolves({signedData: 'YUdWc2JHOD0='});
-
-      const result = pki.signHash(certificate, hash);
-      expect(result.resolveValue).to.be.eql({signedData: 'YUdWc2JHOD0='});
+    it('returns the correct data from signData', async () => {
+      expected_value = { signedData: 'YUdWc2JHOD0=' };
+      const result = await pki.signData('AAAAAA', 'aGVsbG8=');
+      expect(result).to.be.eql({ signedData: 'YUdWc2JHOD0=' });
     });
   });
 });
