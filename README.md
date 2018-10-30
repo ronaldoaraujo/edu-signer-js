@@ -93,6 +93,44 @@ pki.getVersion().then(data => {
   });
 ```
 
+### pki.getCertificates()
+
+**Example**
+
+```js
+  pki.getCertificates().then(certs => {
+    for (var i = 0; i < certs.length; i++) {
+        var cert = certs[i];
+        console.log(cert.fingerprint);
+        console.log(cert.subject);
+        console.log(cert.issuer);
+    }
+  });
+```
+
+### pki.getCertificate()
+
+**Example**
+
+```js
+  pki.getCertificate(thumbprint).then(cert => {
+    console.log(cert.thumbprint);
+    console.log(cert.subject);
+    console.log(cert.issuer);
+    console.log(cert.contentBase64);
+  });
+```
+
+### pki.signedData()
+
+**Example**
+
+```js
+  pki.signedData(thumbprint, data).then(dataSigned => {
+    console.log(dataSigned);
+  });
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
