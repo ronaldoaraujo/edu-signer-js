@@ -1,4 +1,3 @@
-import { WebSocket } from 'mock-socket';
 import PKI from './pki';
 
 export default class EduSigner {
