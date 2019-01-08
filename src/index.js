@@ -1,10 +1,11 @@
-import { WebSocket } from 'mock-socket';
 import PKI from './pki';
+import CLOUD from './cloud';
 
 export default class EduSigner {
   constructor(config) {
     this.licenseKey = config.licenseKey;
     this.PKI = PKI.bind(this)();
+    this.CLOUD = CLOUD.bind(this)();
   }
 
   request(operation, params = {}) {

@@ -46,7 +46,7 @@ pki.getVersion().then(data => {
 ### CommonJS
 
 ```js
-const EduSigner = require('edu-signer-js').default;
+const EduSigner = require('edu-signer-js');
 
 const signer = new EduSigner({
   licenseKey: 'YOUR_KEY_HERE'
