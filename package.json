@@ -60,7 +60,7 @@
     "jsdom-global": "^3.0.2",
     "mocha": "^5.2.0",
     "mock-local-storage": "^1.1.8",
-    "mock-socket": "^7.1.0",
+    "mock-socket": "^9.0.2",
     "node-fetch": "^2.6.0",
     "npm": "^6.11.2",
     "nyc": "^11.7.1",
