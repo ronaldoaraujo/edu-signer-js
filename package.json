@@ -71,6 +71,6 @@
     "webpack": "^2.4.1"
   },
   "dependencies": {
-    "node-forge": "^0.8.5"
+    "node-forge": "^0.10.0"
   }
 }
