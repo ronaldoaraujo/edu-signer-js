@@ -14,7 +14,7 @@ describe('PKI', () => {
 
   beforeEach(() => {
     mockServer.on('connection', server => {
-      mockServer.send(JSON.stringify(expected_value));
+      mockServer.emit('message', JSON.stringify(expected_value));
     });
 
     signer = new EduSigner({
@@ -49,11 +49,13 @@ describe('PKI', () => {
 
   describe('getVersion', () => {
     it('calls send method', async () => {
+      expected_value = { version: '1.0.0.0' };
       await pki.getVersion();
       expect(WebSocket.prototype.send).to.have.been.calledOnce;
     });
 
     it('calls send with the correct arguments', async () => {
+      expected_value = { version: '1.0.0.0' };
       await pki.getVersion();
       expect(WebSocket.prototype.send).to.have.been
         .calledWith('{"Operation":"getVersion","Parameters":[]}');
